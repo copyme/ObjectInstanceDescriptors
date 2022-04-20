@@ -8,15 +8,17 @@
 
 # You will need to adjust the CHANGE ME section!
 
-
+#Just test
 import bpy
 import os
  
 # CHANGE ME - BEGIN
 
 # get the path and make a new folder for the exported meshes
-path = bpy.path.abspath(os.environ['USERPROFILE'] + '\\fbx-ply-export')
+path = bpy.path.abspath(os.environ['USERPROFILE'] + '\\fbx-ply-export-2')
 FBXfile = os.environ['USERPROFILE'] + '\\Documents\\Project\\Données\\Batiment_ifc-convert.fbx'
+
+EXPORT_PARTS=False
 
 # path = bpy.path.abspath('/user/kpluta/home/plyexport/')
 # FBXfile = bpy.path.abspath('/user/kpluta/home/Downloads/H0022.fbx')
@@ -38,28 +40,42 @@ bpy.ops.import_scene.fbx(filepath = FBXfile)
 
 
 # export everything
-ply_path=os.path.join(path, 'fbx2ply-all.ply')
-bpy.ops.object.select_all(action='DESELECT')
-bpy.ops.object.select_by_type(type='MESH')
-bpy.ops.export_mesh.ply(filepath=ply_path, use_selection=True, axis_forward='Y', axis_up='Z')
-
-# # iterate over named objects
-#collect objects to save
+# ply_path=os.path.join(path, 'fbx2ply-all.ply')
 # bpy.ops.object.select_all(action='DESELECT')
 # bpy.ops.object.select_by_type(type='MESH')
-# names = [o.name for o in bpy.context.selected_objects]
+# bpy.ops.export_mesh.ply(filepath=ply_path, use_selection=True, axis_forward='Y', axis_up='Z')
 
-# # deselect all
-# bpy.ops.object.select_all(action='DESELECT')
-# for name in names:
-    # # select the object
-    # obj = bpy.data.objects[name]
-    # bpy.context.view_layer.objects.active = obj
-    # obj.select_set(True)
 
-    # # export object with its name as file name
-    # ply_path = os.path.join(path, name + '.ply')
+# iterate over named objects
 
-    # bpy.ops.export_mesh.ply(filepath=ply_path, use_selection=True, axis_forward='-Y', axis_up='Z')
-    # # deselect
-    # obj.select_set(False)
+bpy.ops.object.select_all(action='DESELECT')
+bpy.ops.object.select_by_type(type='MESH')
+names = [o.name for o in bpy.context.selected_objects]
+
+def remove(word):
+    word = word.replace('/', 'a1')
+    word = word.replace(':', 'a2') 
+    word = word.replace('*', 'a3') 
+    word = word.replace('?', 'a4') 
+    word = word.replace('<', 'a5')
+    word = word.replace('>', 'a6') 
+    word = word.replace('|', 'a7') 
+    return word
+
+# deselect all
+bpy.ops.object.select_all(action='DESELECT')
+for name in names:
+    #name=remove(name)
+    # select the object
+    obj = bpy.data.objects[name]
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    word=remove(name)
+    # export object with its name as file name
+    ply_path = os.path.join(path, word + '.ply')
+
+    bpy.ops.export_mesh.ply(filepath=ply_path, use_selection=True, axis_forward='Y', axis_up='Z')
+    # deselect
+    obj.select_set(False)
+
+
