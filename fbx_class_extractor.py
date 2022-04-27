@@ -59,7 +59,8 @@ def remove(word):
     word = word.replace('?', 'a4') 
     word = word.replace('<', 'a5')
     word = word.replace('>', 'a6') 
-    word = word.replace('|', 'a7') 
+    word = word.replace('|', 'a7')
+    word = word.replace(' ', '_')    # new condition
     return word
 
 # deselect all
