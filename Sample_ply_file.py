@@ -83,7 +83,7 @@ def main(in_put_path, out_put_path, parametre, exe_name):
     
 
 if __name__ == "__main__":
-    main(input_path, output_path, "10000","sample.exe")
+    main(input_path, output_path, "10000","C:\\Users\\taguilar\\Documents\\Project\\code_from_Pierre\\app\\sample\\build\\Release\\sample.exe")
    
    
 
