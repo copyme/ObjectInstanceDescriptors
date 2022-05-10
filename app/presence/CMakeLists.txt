@@ -3,6 +3,7 @@
 
 project(presence)
 
+find_package(CGAL REQUIRED)
 
 ## #############################################################################
 ## Sources
@@ -19,7 +20,7 @@ add_executable(${PROJECT_NAME}
   ${${PROJECT_NAME}_SOURCES})
 
 
-target_link_libraries(${PROJECT_NAME} CGAL stdc++fs)
+target_link_libraries(${PROJECT_NAME} CGAL )
 
 ######################################################################
 ### CMakeLists.txt ends here
