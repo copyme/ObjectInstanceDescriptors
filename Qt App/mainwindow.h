@@ -53,7 +53,7 @@ public:
     void enlarge(Iso& bbox, const FT ratio);
 
 public slots:
-    void help_button();
+    void Select_classes();
 
 public slots:
     void open_classes();

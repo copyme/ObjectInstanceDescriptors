@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     //QListWidgetItem *item = new QListWidgetItem;
     ui->setupUi(this);
     setWindowTitle(" My application ");
-    pointViewer = new CGAL::Basic_viewer_qt(nullptr, "test",  true, true, true, false, true);
+    pointViewer = new CGAL::Basic_viewer_qt(nullptr, "Lidar Data",  true, true, true, false, true);
     ui->for3DViewer->addSubWindow(pointViewer);
     pointViewer->show();
     //ui->listWidget->setSelectionMode(QAbstractItemView::MultiSelection);  To select several files
@@ -47,28 +47,16 @@ namespace PMP = CGAL::Polygon_mesh_processing;
 
 
 
-void MainWindow::help_button()
+void MainWindow::Select_classes()
 {
-    QStringList filelist = QFileDialog::getOpenFileNames(this,tr("Open file"),"C:\\Users\\taguilar\\Documents\\Project\\data","All Files (*.*);;Ply files (*.ply);;Off files (*.off)");
+    QStringList filelist = QFileDialog::getOpenFileNames(this,tr("Open file"),"C:\\Users\\taguilar\\Documents\\Project\\data","Ply files (*.ply)");
 
 
-    for(QList<QString>::const_iterator it=filelist.begin(); it!= filelist.end(); it++){
-
+    for(QList<QString>::const_iterator it=filelist.cbegin(); it!= filelist.cend(); it++){
         new QListWidgetItem(*it, ui->listWidget);
-        lidar_point_set.clear();
-        if(!CGAL::IO::read_point_set(it->toStdString(), lidar_point_set))
-        {
-          throw std::runtime_error("Can't read input file " + it->toStdString());
-        }
-        show_PointSet(pointViewer, lidar_point_set.point_map().begin(), lidar_point_set.point_map().end(), CGAL::IO::Color(rand()%256, rand()%256, rand()%256));
-
     }
 
 }
-    //QMessageBox msgBox;
-    //msgBox.setText(" Just a Test :) ");
-    //msgBox.exec();
-
 
 
 void MainWindow::open_classes()
@@ -95,7 +83,8 @@ void MainWindow::open_classes()
 
 void MainWindow::open_lidar()
 {
-    QString file_name = QFileDialog::getOpenFileName(this,tr("Open file"),"C:\\Users\\taguilar\\Documents\\Project\\data","All Files (*.*);;Ply files (*.ply);;Off files (*.off)");
+    QString file_name = QFileDialog::getOpenFileName(this,tr("Open file"),"C:\\Users\\taguilar\\Documents\\Project\\data","Ply files (*.ply)");
+    //Autre option : "All Files (*.*);;Ply files (*.ply);;Off files (*.off)"
     //QStandardPaths::displayName(QStandardPaths::HomeLocation)
 
     if(file_name==0){
@@ -189,15 +178,16 @@ void MainWindow::some_stat()
     std::cout << "median distance: " << median << std::endl;
     std::cout << "percentile 80 distance: " << p80 << std::endl;
 
-   CGAL::IO::Color random_color(rand()%256, rand()%256, rand()%256);
-   show_PointSet(pointViewer, nearest_point_set.point_map().begin(), nearest_point_set.point_map().end(), random_color);
-   pointViewer->show();
+   //CGAL::IO::Color random_color(rand()%256, rand()%256, rand()%256);
+   //show_PointSet(pointViewer, nearest_point_set.point_map().begin(), nearest_point_set.point_map().end(), random_color);
+  // pointViewer->show();
+    CGAL::Basic_viewer_qt* tmp2Viewer = new CGAL::Basic_viewer_qt(nullptr, "nearest points",  true, true, true, false, true);
+    ui->for3DViewer->addSubWindow(tmp2Viewer);
+    CGAL::IO::Color new_color(0,255,0);
+    show_PointSet(tmp2Viewer, nearest_point_set.point_map().begin(), nearest_point_set.point_map().end(), new_color);
+    tmp2Viewer->show();
 
-    CGAL::Basic_viewer_qt* tmpViewer = new CGAL::Basic_viewer_qt(nullptr, "nearest points",  true, true, true, false, true);
-    ui->for3DViewer->addSubWindow(tmpViewer);
-    CGAL::IO::Color tmp_color(0,255,0);
-    show_PointSet(tmpViewer, nearest_point_set.point_map().begin(), nearest_point_set.point_map().end(), tmp_color);
-    tmpViewer->show();
+
 }
 
 void MainWindow::cliquer(QListWidgetItem *item)
@@ -212,10 +202,6 @@ void MainWindow::cliquer(QListWidgetItem *item)
 
     if(item->isSelected())
     {
-
-        //First Test
-        //item->setText("Change name ");
-        //item->setTextColor(Qt::red);
 
         //double density = 1e4;
         std::cout << "mesh filename: " << item << std::endl;
@@ -235,7 +221,7 @@ void MainWindow::cliquer(QListWidgetItem *item)
 
         // sample mesh uniformly :
         sample_mesh(input_mesh);
-        CGAL::Basic_viewer_qt* tmpViewer = new CGAL::Basic_viewer_qt(nullptr, "test",  true, true, true, false, true);
+        CGAL::Basic_viewer_qt* tmpViewer = new CGAL::Basic_viewer_qt(nullptr, "See element",  true, true, true, false, true);
         ui->for3DViewer->addSubWindow(tmpViewer);
         CGAL::IO::Color tmp_color(0,0,255);
         show_PointSet(tmpViewer, class_sampled_points.cbegin(), class_sampled_points.cend(), tmp_color);
@@ -248,18 +234,31 @@ void MainWindow::cliquer(QListWidgetItem *item)
         some_stat();
 
 
+        Point p0 (class_tmp_bbox.xmin(), class_tmp_bbox.ymin(), class_tmp_bbox.zmin());
+        Point p1 (class_tmp_bbox.xmax(), class_tmp_bbox.ymin(), class_tmp_bbox.zmin());
 
 
-        // Show presence mesh to for3DViewer :
-      //  CGAL::IO::Color random_color(rand()%256, rand()%256, rand()%256);
-        //pointViewer = new CGAL::Basic_viewer_qt(nullptr, "test",  true, true, true, false, true);
-     //   show_PointSet(pointViewer, class_sampled_points.cbegin(), class_sampled_points.cend(), random_color);
-
-        //ui->for3DViewer->addSubWindow(pointViewer);
-        //pointViewer->show();
+        CGAL::Basic_viewer_qt* tmp2Viewer = new CGAL::Basic_viewer_qt(nullptr, "nearest points",  true, true, true, false, true);
+        ui->for3DViewer->addSubWindow(tmp2Viewer);
 
 
+        CGAL::IO::Color new_color(0,255,0);
+        tmp2Viewer->add_segment( p0, p1);
+        show_PointSet(tmp2Viewer, lidar_point_set.point_map().begin(), lidar_point_set.point_map().end(), new_color);
+        tmp2Viewer->show();
 
+
+//        pointViewer->add_segment( p0, p1);
+//        auto bbx = pointViewer->bounding_box();
+//        pointViewer->camera()->
+//            setSceneBoundingBox(CGAL::qglviewer::Vec(bbx.xmin(),
+//                                                     bbx.ymin(),
+//                                                     bbx.zmin()),
+//                                CGAL::qglviewer::Vec(bbx.xmax(),
+//                                                     bbx.ymax(),
+//                                                     bbx.zmax()));
+//        pointViewer->showEntireScene();
+//        pointViewer->redraw();
 
     }
 }
