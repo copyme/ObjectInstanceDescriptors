@@ -67,6 +67,8 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Point_set lidar_point_set;
+    Point p;
+    Point_set nearest_point_set;
     void kd_tree(Point_set &lidar_point_set);
     CGAL::Basic_viewer_qt * pointViewer;
 
