@@ -233,32 +233,54 @@ void MainWindow::cliquer(QListWidgetItem *item)
         //compute distance statistics between mesh-samples and the cloud
         some_stat();
 
+        // Points for bounding box:
+        Point p0 (class_tmp_bbox.xmin(), class_tmp_bbox.ymax(), class_tmp_bbox.zmin());
+        Point p1 (class_tmp_bbox.xmax(), class_tmp_bbox.ymax(), class_tmp_bbox.zmin());
+        Point p2(class_tmp_bbox.xmax(), class_tmp_bbox.ymin(), class_tmp_bbox.zmin());
+        Point p3(class_tmp_bbox.xmax(), class_tmp_bbox.ymin(), class_tmp_bbox.zmax());
+        Point p4(class_tmp_bbox.xmin(), class_tmp_bbox.ymin(), class_tmp_bbox.zmax());
+        Point p5(class_tmp_bbox.xmin(), class_tmp_bbox.ymax(), class_tmp_bbox.zmax());
+        Point p6(class_tmp_bbox.xmin(), class_tmp_bbox.ymin(), class_tmp_bbox.zmin());  //origin
+        Point p7(class_tmp_bbox.xmax(), class_tmp_bbox.ymax(), class_tmp_bbox.zmax());
 
-        Point p0 (class_tmp_bbox.xmin(), class_tmp_bbox.ymin(), class_tmp_bbox.zmin());
-        Point p1 (class_tmp_bbox.xmax(), class_tmp_bbox.ymin(), class_tmp_bbox.zmin());
 
 
-        CGAL::Basic_viewer_qt* tmp2Viewer = new CGAL::Basic_viewer_qt(nullptr, "nearest points",  true, true, true, false, true);
+
+        CGAL::Basic_viewer_qt* tmp2Viewer = new CGAL::Basic_viewer_qt(nullptr, "Bounding Box element detected",  true, true, true, false, true);
         ui->for3DViewer->addSubWindow(tmp2Viewer);
 
-
+        //Segment for bounding box
         CGAL::IO::Color new_color(0,255,0);
-        tmp2Viewer->add_segment( p0, p1);
+        tmp2Viewer->add_segment(p0 , p1);
+        tmp2Viewer->add_segment(p1 , p2);
+        tmp2Viewer->add_segment(p2 , p3);
+        tmp2Viewer->add_segment(p3 , p4);
+        tmp2Viewer->add_segment(p4 , p5);
+        tmp2Viewer->add_segment(p4 , p6);
+        tmp2Viewer->add_segment(p3 , p7);
+        tmp2Viewer->add_segment(p5 , p0);
+        tmp2Viewer->add_segment(p5 , p7);
+        tmp2Viewer->add_segment(p1 , p7);
+        tmp2Viewer->add_segment(p0 , p6);
+        tmp2Viewer->add_segment(p2 , p6);
+
         show_PointSet(tmp2Viewer, lidar_point_set.point_map().begin(), lidar_point_set.point_map().end(), new_color);
         tmp2Viewer->show();
 
 
+        //tmp2Viewer->showEntireScene();
+        //tmp2Viewer->redraw();
 //        pointViewer->add_segment( p0, p1);
 //        auto bbx = pointViewer->bounding_box();
-//        pointViewer->camera()->
+//        tmp2Viewer->camera()->
 //            setSceneBoundingBox(CGAL::qglviewer::Vec(bbx.xmin(),
 //                                                     bbx.ymin(),
 //                                                     bbx.zmin()),
 //                                CGAL::qglviewer::Vec(bbx.xmax(),
 //                                                     bbx.ymax(),
 //                                                     bbx.zmax()));
-//        pointViewer->showEntireScene();
-//        pointViewer->redraw();
+//        tmp2Viewer->showEntireScene();
+//        tmp2Viewer->redraw();
 
     }
 }
