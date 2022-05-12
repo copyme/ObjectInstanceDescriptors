@@ -52,9 +52,12 @@ void MainWindow::Select_classes()
 {
     QStringList filelist = QFileDialog::getOpenFileNames(this,tr("Open file"),"C:\\Users\\taguilar\\Documents\\Project\\data","Ply files (*.ply)");
 
+//    for(int i=0;i<filelist.size();i++){
+//        QFileInfo info(filelist[i]);
+//        new QListWidgetItem(info.fileName(), ui->listWidget);
+//    }
 
-
-    for(QList<QString>::const_iterator it=filelist.cbegin(); it!= filelist.cend(); it++){
+   for(QList<QString>::const_iterator it=filelist.cbegin(); it!= filelist.cend(); it++){
         new QListWidgetItem(*it, ui->listWidget);
     }
 
@@ -323,7 +326,8 @@ void MainWindow::cliquer(QListWidgetItem *item)
         for (int i=0;i<nearest_point_set.size();i++){
             p=nearest_point_set.point(i);
             for (int k=0;k<images.size();k++){
-                if(images.at(k)==item->text()){
+                QFileInfo info(item->text());
+                if(images.at(k)== info.fileName()){
                     out <<  p.x() << ", " << p.y() << ", "<< p.z() << ", " << k <<"\n";
                 }
             }
@@ -335,7 +339,10 @@ void MainWindow::cliquer(QListWidgetItem *item)
 
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+        //    for(int i=0;i<filelist.size();i++){
+        //        QFileInfo info(filelist[i]);
+        //        new QListWidgetItem(info.fileName(), ui->listWidget);
+        //    }
 
 
 
