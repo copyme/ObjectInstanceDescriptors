@@ -196,6 +196,110 @@ void MainWindow::some_stat()
 }
 
 
+void MainWindow::teste(){
+// Partie Création du Fichier texte contenant les classes et des numéros :
+    QString link = "C:\\Users\\taguilar\\Documents\\NON.txt";
+
+    // Création d'un objet QFile
+    QFile f1(link);
+    // On ouvre notre fichier en lecture seule et on vérifie l'ouverture
+    if (!f1.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+    // Création d'un objet QTextStream à partir de notre objet QFile
+    QTextStream zoom(&f1);
+    //assume the directory exists and contains some files and you want all jpg and JPG files
+    QDir directory("C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study1_all");
+    QStringList images = directory.entryList(QStringList() << "*.ply" ,QDir::Files);
+
+    for (int j=0;j<images.size();j++){
+        zoom << images.at(j) << ", " << j <<"\n";
+    }
+
+    f1.close();
+
+/////////////////
+// Partie pour créer le deuxième fichier: contenant pour chaque point, ses coordonnées et sa classe:
+
+    QString fichier = "C:\\Users\\taguilar\\Documents\\OUI.txt";
+
+    QFile file(fichier);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+
+    for(int j=0;j<images.size();j++){
+
+
+    //out << var.fileName() << "\n";
+
+
+    }
+}
+
+void MainWindow::teste2()
+{
+    QString fichier = "C:\\Users\\taguilar\\Documents\\CaseStudy6_List_Nearest_Points.txt";
+
+    QFile file(fichier);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+
+    std::cout<<" ok 1 ";
+
+    for (int i = 0; i < ui->listWidget->count(); i++)
+    {
+        QListWidgetItem * item = ui->listWidget->item(i);
+
+        item->setSelected(false);
+
+        std::cout<<" ok 2 ";
+
+        Surface_mesh input_mesh;
+
+        std::cout << "read mesh... ";
+        if (!PMP::IO::read_polygon_mesh(item->text().toStdString(), input_mesh) ||
+            is_empty(input_mesh) || !is_triangle_mesh(input_mesh))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The element is not a mesh!");
+            msgBox.exec();
+            return;
+        }
+        std::cout << "done (" << input_mesh.number_of_faces() << " facets)" << std::endl;
+
+        sample_mesh(input_mesh);
+        std::cout<<"ok 3";
+
+        kd_tree(lidar_point_set);
+
+        some_stat();
+
+
+
+        QDir directory("C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study6_all");
+        QStringList images = directory.entryList(QStringList() << "*.ply" ,QDir::Files);
+
+        for (int i=0;i<nearest_point_set.size();i++){
+            p=nearest_point_set.point(i);
+            for (int k=0;k<images.size();k++){
+                QFileInfo info(item->text());
+                if(images.at(k)== info.fileName()){
+                    out <<  p.x() << ", " << p.y() << ", "<< p.z() << ", " << k <<"\n";
+                }
+            }
+        }
+
+        nearest_point_set.clear();
+
+    }
+    file.close();
+}
+
 
 void MainWindow::cliquer(QListWidgetItem *item)
 {
@@ -277,7 +381,7 @@ void MainWindow::cliquer(QListWidgetItem *item)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //      Création des fichiers :
 
-        QString link = "C:\\Users\\taguilar\\Documents\\ZFileList.txt";
+        QString link = "C:\\Users\\taguilar\\Documents\\CaseStudy2_Nearest_Points.txt";
 
         // Création d'un objet QFile
         QFile f1(link);
@@ -287,7 +391,7 @@ void MainWindow::cliquer(QListWidgetItem *item)
         // Création d'un objet QTextStream à partir de notre objet QFile
         QTextStream zoom(&f1);
         //assume the directory exists and contains some files and you want all jpg and JPG files
-        QDir directory("C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study1_all");
+        QDir directory("C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study6_all");
         QStringList images = directory.entryList(QStringList() << "*.ply" ,QDir::Files);
 
         for (int j=0;j<images.size();j++){
@@ -311,7 +415,6 @@ void MainWindow::cliquer(QListWidgetItem *item)
         // Création d'un objet QTextStream à partir de notre objet QFile
         QTextStream out(&file);
 
-
         //Partie qui fonctionne :
         for (int i=0;i<nearest_point_set.size();i++){
             p=nearest_point_set.point(i);
@@ -324,36 +427,9 @@ void MainWindow::cliquer(QListWidgetItem *item)
         }
         file.close();
         nearest_point_set.clear();
+    }
 
-
- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        //    for(int i=0;i<filelist.size();i++){
-        //        QFileInfo info(filelist[i]);
-        //        new QListWidgetItem(info.fileName(), ui->listWidget);
-        //    }
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//        //Partie qui ne fonctionne pas :
-//        for (Point_set::const_iterator it = nearest_point_set.begin(); it != nearest_point_set.end(); ++it){
-//            p = nearest_point_set.point(*it);
-//          //out << p.x() << ", " << p.y() << ", "<< p.z() << "\n";
-//            out << "oui\n";
-
-//        }
-//        file.close();
-
-
-
-
-        //qDebug()<<" Its done";
-        //flux << "Bonjour," << endl << "Nous sommes le " << 3 << " avril " << 2009 << endl;
-        //flux << "This file is generated by Qt\n";
-
-
+}
 
         //tmp2Viewer->showEntireScene();
         //tmp2Viewer->redraw();
@@ -368,10 +444,6 @@ void MainWindow::cliquer(QListWidgetItem *item)
 //                                                     bbx.zmax()));
 //        tmp2Viewer->showEntireScene();
 //        tmp2Viewer->redraw();
-
-    }
-}
-
 
 
 

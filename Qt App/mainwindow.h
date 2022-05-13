@@ -60,7 +60,9 @@ public slots:
     void open_lidar();
     void cliquer(QListWidgetItem *item);
     void some_stat();
+    void teste();
 
+    void teste2();
 
 
 

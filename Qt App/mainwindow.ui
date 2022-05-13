@@ -210,6 +210,32 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="Try">
+    <property name="geometry">
+     <rect>
+      <x>1140</x>
+      <y>840</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>1130</x>
+      <y>890</y>
+      <width>75</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -463,6 +489,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>Try</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>teste2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1177</x>
+     <y>873</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>687</x>
+     <y>476</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>example_click_btn()</slot>
@@ -473,5 +515,7 @@ p, li { white-space: pre-wrap; }
   <slot>presence_code()</slot>
   <slot>cliquer(QListWidgetItem*)</slot>
   <slot>Select_classes()</slot>
+  <slot>teste()</slot>
+  <slot>teste2()</slot>
  </slots>
 </ui>
