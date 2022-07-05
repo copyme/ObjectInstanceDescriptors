@@ -24,11 +24,13 @@ from sklearn import svm
 
 from sklearn.metrics import accuracy_score
 import trimesh
-
+from sklearn.ensemble import RandomForestClassifier
 
 ########################################################################################
 
-Path = "C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study2_all\\"
+Path = "C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study6_all\\"
+
+BIG_PC_CASE1 = "C:\\Users\\taguilar\\Documents\\Project\\data\\CaseStudy6_PC _subsampled_01.ply"
 
 ########################################################################################
 
@@ -69,20 +71,58 @@ def MAJ_label(mon_dico, mes_labels):
     return mes_labels
     
 
-def perform_SVM(array_Files, array_Labels):
+def perform_classifieur(array_Files, array_Labels, Big_PC,Nb_Files_Folder):
     
     X_train, X_test, y_train, y_test = train_test_split(array_Files, array_Labels, train_size=0.75,stratify = array_Labels)  # Permet de mieux mélanger
     
     print('Len X_train: %.3i' % len(X_train))
     print('Len X_test: %.3i' % len(X_test))
 
-    model = make_pipeline(StandardScaler(), svm.SVC(C = 0.1, kernel = 'rbf'))
+    # model = make_pipeline(StandardScaler(), svm.SVC(C = 0.1, kernel = 'rbf'))
+    
+    model = RandomForestClassifier(max_depth=10)
     
     model.fit(X_train, y_train)
     
     y_pred = model.predict(X_test)
     
     print('Accuracy: %.3f' % accuracy_score(y_test, y_pred))
+    
+    ## Big PC with unlabelled data
+    
+    PCD = o3d.io.read_point_cloud(Big_PC)
+
+    Points_List = np.asarray(PCD.points)
+    Points_List = Points_List.tolist()
+    
+    PRED = model.predict(Points_List)
+    
+    DICO = {}
+    
+    for i in range(1, Nb_Files_Folder + 1):
+        LAB = []
+        for j in range(len(PRED)):
+            if PRED[j] == i: 
+                LAB.append(Points_List[j])
+        DICO[i] = LAB
+    
+    
+    
+    return Points_List, PRED, DICO
+    
+    
+    
+    
+def visualization_PC(dico):
+    Result = []
+    for i in dico.keys():
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(dico[i])
+        pcd.paint_uniform_color([random.random(), random.random(), random.random()])
+        Result.append(pcd)
+    o3d.visualization.draw(Result)
+
+    
 ########################################################################################
 
            
@@ -90,7 +130,7 @@ if __name__ == "__main__":
 
     ## Create DATA from sampled mesh :
     
-    data, label = create_data_to_learn(Path, 10000)
+    data, label = create_data_to_learn(Path, 1000)
     
     print('Nombre de points: %.3i' % len(data))
     print('Nombre de labels: %.3i' % len(label))
@@ -104,16 +144,17 @@ if __name__ == "__main__":
     print('Nombre de labels MAJ: %.3i' % len(upd_label))
     
     
-    ## Perform SVM : 
-    perform_SVM(data, upd_label)
+    ## Perform Classifieur : 
+    BIG_PC, PREDICTION, DICT = perform_classifieur(data, upd_label, BIG_PC_CASE1,196)
     
     
-    ## Others (tests, Visualization ....) :
-    # mesh = trimesh.load("C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study2_all\\0762_x_2032mm_2_0762_x_2032mm_2_[151902].ply")
-    # points1 = mesh.sample(10000)
-    # pcd2 = o3d.geometry.PointCloud()
-    # pcd2.points = o3d.utility.Vector3dVector(points1)
-    # o3d.visualization.draw([pcd2])
+    ## Visualization : 
+    # print(DICT)
+    visualization_PC(DICT)
+    
+    
+    
+
     
     
     
