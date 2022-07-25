@@ -15,8 +15,8 @@ import os
 # CHANGE ME - BEGIN
 
 # get the path and make a new folder for the exported meshes
-path = bpy.path.abspath(os.environ['USERPROFILE'] + '\\fbx-ply-export-2')
-FBXfile = os.environ['USERPROFILE'] + '\\Documents\\Project\\Données\\Batiment_ifc-convert.fbx'
+path = bpy.path.abspath(os.environ['USERPROFILE'] + '\\Extract')
+FBXfile = os.environ['USERPROFILE'] + '\\Documents\\Project\\data\\Données\\withelay-revit-floor-export-fbx.fbx'
 
 EXPORT_PARTS=False
 
