@@ -29,9 +29,9 @@ from sklearn.decomposition import PCA
 from sklearn.neural_network import MLPClassifier
 ########################################################################################
 
-Path = "C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study1_all_ply\\"
+Path = "C:\\Users\\taguilar\\Documents\\CaseStudy_files\\Ply_format_CaseStudy_fix\\fbx-ply-export-Case_Study6_all\\"
 
-BIG_PC_CASE1 = "C:\\Users\\taguilar\\Documents\\Project\\data\\case_1_subsampled_005.ply"
+BIG_PC_CASE1 = "C:\\Users\\taguilar\\Documents\\Project\\data\\CaseStudy6_PC _subsampled_01.ply"
 
 
 ########################################################################################
@@ -47,26 +47,26 @@ def create_data_to_learn(dossier,NB_Of_Points):
         cpt = 1
         for file in filenames:
             cpt +=1
-            # Générer les points du nuage : 
+            # Générer les Points du nuage : 
             mesh = trimesh.load(dossier + file)
            
-            points = mesh.sample(NB_Of_Points)
+            Points = mesh.sample(NB_Of_Points)
             
-            for i in points:
+            for i in Points:
                 DATA.append(i)
                 ## Si je veux utiliser un bruit pour l'entrainement :
                 # DATA.append([i[0] + random.uniform(-0.02, 0.02), i[1] + random.uniform(-0.02, 0.02), i[2] + random.uniform(-0.02, 0.02)])
                 LABEL.append(file)
             
-            DICO[cpt] = points
+            DICO[cpt] = Points
             cpt +=1
             
             pcd = o3d.geometry.PointCloud()
-            pcd.points = o3d.utility.Vector3dVector(DATA)
-            pcd.paint_uniform_color([1, 0, 0])
+            pcd.points = o3d.utility.Vector3dVector(Points)
+            # pcd.paint_uniform_color([1, 0, 0])
             axis_aligned_bounding_box = pcd.get_axis_aligned_bounding_box()
             
-            info = axis_aligned_bounding_box.scale(1.01,axis_aligned_bounding_box.get_center())
+            info = axis_aligned_bounding_box.scale(1.10,axis_aligned_bounding_box.get_center())
             
             List_of_BB.append(info)
             
@@ -137,9 +137,9 @@ def perform_classifieur(array_Files, array_Labels, Big_PC, Nb_Files_Folder, list
     print('Len X_test: %.3i' % len(X_test))
 
     ########################### Choisir son classifieur ###############################
-    # model = make_pipeline(StandardScaler(), svm.SVC(C = 0.1, kernel = 'rbf'))
+    model = make_pipeline(StandardScaler(), svm.SVC(C = 0.1, kernel = 'rbf'))
     
-    model = RandomForestClassifier(max_depth=2)
+    # model = RandomForestClassifier()
     
     # model = MLPClassifier(random_state=1, max_iter=300)
     #######################################################################
@@ -160,25 +160,24 @@ def perform_classifieur(array_Files, array_Labels, Big_PC, Nb_Files_Folder, list
     Resultat = []  
     
     DICO = {}
-    for m in list(range(Nb_Files_Folder + 1)):
+    
+    for m in range(1, Nb_Files_Folder + 1):
         DICO[m] = []
-     
+    cpt = 0 
     for i in list_of_BB:
+        cpt+=1
         L = In_BB_Or_Not(i, Points_List)  # Les points
         print(i)
         PRED = model.predict(L)           # Les labels prédits
-        
+        print(cpt)
         for j in range(len(L)):
             DICO[PRED[j]].append(L[j])
-            print(j)
+            
         
     return Points_List, PRED, DICO
 
         
-        
-        
             
-    
     
 def visualization_PC(dico):
     Result = []
@@ -198,7 +197,7 @@ if __name__ == "__main__":
 
     ## Create DATA from sampled mesh :
     
-    data, label, DICO_ply, Number_Files, BB_liste = create_data_to_learn(Path, 10)
+    data, label, DICO_ply, Number_Files, BB_liste = create_data_to_learn(Path, 1000)
     
     print('Nombre de points: %.3i' % len(data))
     print('Nombre de labels: %.3i' % len(label))
@@ -216,7 +215,7 @@ if __name__ == "__main__":
     
     
     ## Perform Classifieur : 
-    BIG_PC, PREDICTION, DICT = perform_classifieur(data, upd_label, BIG_PC_CASE1, 69, BB_liste)
+    BIG_PC, PREDICTION, DICT = perform_classifieur(data, upd_label, BIG_PC_CASE1, 196, BB_liste)
     
     
     ## Visualization : 
