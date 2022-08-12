@@ -30,62 +30,83 @@ import pandas as pd
 import seaborn as sns 
 import plyfile
 
+from sklearn.preprocessing import normalize
 #######################################################################################
 ####################################  Description  ####################################
+
+
 
 #######################################################################################
 # File
 
-IFC_coordinates_and_label = "D:\\Test_11_08_2022\\Troisieme\\CS6_IFC.txt"
+IFC_coordinates_and_label = "D:\\Test_11_08_2022\\Troisieme\\INFORMATIONS.txt"
 
-# LIDAR_DATA = "C:\\Users\\taguilar\\Documents\\Project\\data\\case_1_subsampled_005.ply"  # With noise
-
-LIDAR_DATA = "D:\\Test_11_08_2022\\Troisieme\\Data_No_Noise\\CS6_No_Noise.ply"    # No noise
+LIDAR_DATA = "C:\\Users\\taguilar\\Documents\\Project\\data\\case_1_subsampled_005.ply" 
 
 #######################################################################################
 
 
 
-def perform_classifieur_on_LIDAR(features_IFC, label, features_LIDAR, LIDAR_data, Nb_Files_Folder):
 
-    #######################################################################
+    
+# Utilisation du classifieur en question :
 
-    X_train, X_test, y_train, y_test = train_test_split(features_IFC, label, train_size=0.80,stratify = label)  # Permet de mieux mélanger
+def perform_classifieur(array_Files, array_Labels, features_Lidar, Lidar_data, Nb_Files_Folder):
     
-    print('Len X_train: %.3i' % len(X_train))
-    print('Len X_test: %.3i' % len(X_test))
-
-    ########################### Choisir son classifieur ###############################
-    # model = make_pipeline(StandardScaler(), svm.SVC(C = 0.1, kernel = 'rbf'))
     
-    model = RandomForestClassifier()
     
-    # model = MLPClassifier(random_state=1, max_iter=300)
-    #######################################################################
-    
-    model.fit(X_train, y_train)
-    
-    y_pred = model.predict(X_test)
-    
-    print('Accuracy: %.3f' % accuracy_score(y_test, y_pred))
-    
-    ## Features BIG Points Cloud
-    PRED = model.predict(features_LIDAR)
-    
-     
+    ##########################################
+    # Création du dictionnaire final :
     DICO = {}
+    for m in range(1, Nb_Files_Folder + 1):
+        DICO[m] = []  
+    ##########################################
     
+    # On va itérer sur toutes les classes, entraîner et prédire à chaque fois :
+
     for i in range(1, Nb_Files_Folder + 1):
+    
+        COPY_LAB = np.copy(array_Labels)
+
+        COPY_LAB[COPY_LAB < i] = 0
+        COPY_LAB[COPY_LAB > i] = 0
+        
+        # import pdb
+        # pdb.set_trace()
+        
         print(i)
+        X_train, X_test, y_train, y_test = train_test_split(array_Files, COPY_LAB, train_size = 0.75,stratify = COPY_LAB)  # Permet de mieux mélanger
+    
+        print('Len X_train: %.3i' % len(X_train))
+        print('Len X_test: %.3i' % len(X_test))
+        
+
+    ########################### Choisir Son Classifieur ###############################
+    
+        model = RandomForestClassifier(max_depth = 16)
+    
+    ###################################################################################
+    
+        model.fit(X_train, y_train)
+    
+        y_pred = model.predict(X_test)
+    
+        print('Accuracy: %.3f' % accuracy_score(y_test, y_pred))
+    
+        ################ Prédiction sur le PC #################
+        PRED = model.predict(features_Lidar)
+        #######################################################
+        
         LAB = []
         for j in range(len(PRED)):
-            if PRED[j] == i: 
-                LAB.append(LIDAR_data[j])
-                # print(j)
+            
+            if PRED[j] != 0:
+                LAB.append(Lidar_data[j])
         DICO[i] = LAB
-
+  
     return DICO
-    
+
+
 
 
 
@@ -101,13 +122,9 @@ def visualization_PC(dico):
 
 
 
-
-
-from sklearn.preprocessing import normalize
-
-
 if __name__ == "__main__":
     #######################################################################################
+    
     # LIDAR:
     f = plyfile.PlyData().read(LIDAR_DATA)
     
@@ -115,6 +132,7 @@ if __name__ == "__main__":
     
     Coordinates_LIDAR = INFO_LIDAR[:,0:3]
     #######################################################################################
+    
     # IFC: 
     Read_IFC = np.loadtxt(IFC_coordinates_and_label, delimiter = ' ')
     
@@ -122,6 +140,7 @@ if __name__ == "__main__":
     
     Coordinates = Read_IFC[:,0:3]
     #######################################################################################
+    
     # Multiply:
     m2cm = 100
     Coordinates = Coordinates * m2cm
@@ -143,38 +162,42 @@ if __name__ == "__main__":
     Features_IFC = np.round_(Coordinates)
     
     Features_LIDAR = np.round_(Coordinates_LIDAR)
-    # Export
-    Export_IFC = "D:\\Test_11_08_2022\\Troisieme\\Features_IFC.txt"
-    Export_LIDAR = "D:\\Test_11_08_2022\\Troisieme\\Features_LIDAR.txt"
     
-    # np.savetxt(Export_IFC, Features_IFC, delimiter=' ')
-    # np.savetxt(Export_LIDAR, Features_LIDAR, delimiter=' ')
+    # Export
+    Export_IFC = "D:\\Test_11_08_2022\\Troisieme\\Features_IFC_CS1.txt"
+    Export_LIDAR = "D:\\Test_11_08_2022\\Troisieme\\Features_LIDAR_CS1.txt"
+    
+    np.savetxt(Export_IFC, Features_IFC, delimiter=' ')
+    np.savetxt(Export_LIDAR, Features_LIDAR, delimiter=' ')
     
     # import pdb
     # pdb.set_trace()
     
     #######################################################################################
+    
     # Classifieur:
-    DICO = perform_classifieur_on_LIDAR(Features_IFC, LABEL, Features_LIDAR, Coordinates_LIDAR, 196)
+    DICO = perform_classifieur(Features_IFC, LABEL, Features_LIDAR, Coordinates_LIDAR, 69)
     
     #######################################################################################
+    
     import pdb
     pdb.set_trace()
-    # EXPORT PREDICTION:
+    #######################################################################################
+    # Export Point Cloud :
     
-    # Export_PREDICT_CS1 = "D:\\Test_11_08_2022\\Troisieme\\PREDICTION\\PREDICTION_CS1_No_Noise.txt"
-    # A = np.array([])
-    # for i in DICO:
-        # for j in DICO[i]:
-            # B = np.array([])          
-            # B = np.append(j, i)
-            # if len(A) == 0: 
-                # A = np.append(A, B)
-            # else:
-                # A = np.vstack([A,B])
-            
-    # np.savetxt(Export_PREDICT_CS1, A, delimiter=' ')
-
+    Export_PREDICT = "D:\\Test_11_08_2022\\Troisieme\\PREDICTION_CS1.txt"
+    
+    # file = open("dictfile.txt","w") 
+ 
+    # for key in dict_students.keys(): 
+ 
+        # file.write(str(key)+"  "+str(dict_students[key])) 
+        # file.write("\n") 
+ 
+    # file.close()
+    
+    # np.savetxt(Features_from_ply_normalized, A_norm, delimiter=' ')
+    
     #######################################################################################
     
     # Visualization :
